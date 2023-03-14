@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Thiago-martinss/bookings/pkg/config"
-	"github.com/Thiago-martinss/bookings/pkg/handlers"
-	"github.com/Thiago-martinss/bookings/pkg/render"
+	"github.com/Thiago-martinss/bookings/internal/config"
+	"github.com/Thiago-martinss/bookings/internal/handlers"
+	"github.com/Thiago-martinss/bookings/internal/render"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
 	"log"
@@ -43,7 +43,7 @@ func main() {
 
 	render.NewTemplates(&app)
 
-	fmt.Println(fmt.Sprintf("Staring application on port %s", portNumber))
+	fmt.Println(fmt.Sprintf("Starting application on port %s", portNumber))
 
 	srv := &http.Server{
 		Addr:    portNumber,
