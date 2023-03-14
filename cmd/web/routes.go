@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/Thiago-martinss/bookings/internal/config"
-	"github.com/Thiago-martinss/bookings/internal/handlers"
+	"github.com/thiago-martinss/bookings/internal/config"
+	"github.com/thiago-martinss/bookings/internal/handlers"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"net/http"
@@ -27,6 +27,8 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/contact", handlers.Repo.Contact)
 
 	mux.Get("/make-reservation", handlers.Repo.Reservation)
+	mux.Post("/make-reservation", handlers.Repo.PostReservation)
+
 
 	
 

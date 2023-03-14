@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Thiago-martinss/bookings/internal/config"
-	"github.com/Thiago-martinss/bookings/internal/handlers"
-	"github.com/Thiago-martinss/bookings/internal/render"
+	"github.com/thiago-martinss/bookings/internal/config"
+	"github.com/thiago-martinss/bookings/internal/handlers"
+	"github.com/thiago-martinss/bookings/internal/render"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
 	"log"

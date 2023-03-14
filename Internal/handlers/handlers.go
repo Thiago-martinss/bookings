@@ -6,9 +6,10 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/Thiago-martinss/bookings/internal/config"
-	"github.com/Thiago-martinss/bookings/internal/models"
-	"github.com/Thiago-martinss/bookings/internal/render"
+	"github.com/thiago-martinss/bookings/Internal/forms"
+	"github.com/thiago-martinss/bookings/internal/config"
+	"github.com/thiago-martinss/bookings/internal/models"
+	"github.com/thiago-martinss/bookings/internal/render"
 )
 
 // Repo the repository used by the handlers
@@ -58,12 +59,17 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 // Reservation renders the make a reservation page and displays form
 func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, "make-reservation.page.html", &models.TemplateData{
-
+		Form: forms.New(nil),
 	})
 }
 
-// Generals renders the room page
+// PostReservation handles the posting of a reservation form
+func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 
+	
+}
+
+// Generals renders the room page
 func (m *Repository) Generals(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, "generals.page.html", &models.TemplateData{
 
@@ -71,7 +77,6 @@ func (m *Repository) Generals(w http.ResponseWriter, r *http.Request) {
 }
 
 // Majors renders the room page
-
 func (m *Repository) Majors(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, r, "majors.page.html", &models.TemplateData{
 

@@ -1,4 +1,4 @@
-module github.com/Thiago-martinss/bookings
+module github.com/thiago-martinss/bookings
 
 go 1.20
 
