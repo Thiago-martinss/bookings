@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/thiago-martinss/bookings/internal/config"
 	"github.com/thiago-martinss/bookings/internal/handlers"
+	"github.com/thiago-martinss/bookings/internal/helpers"
 	"github.com/thiago-martinss/bookings/internal/models"
 	"github.com/thiago-martinss/bookings/internal/render"
 )
@@ -19,6 +21,9 @@ import (
 
 	var app config.AppConfig
 	var session *scs.SessionManager
+	var infoLog *log.Logger
+	var errorLog *log.Logger
+
 	
 	// main is the main function
 	func main() {
@@ -46,6 +51,12 @@ import (
 		gob.Register(models.Reservation{})
 		// change this to true when in production
 		app.InProduction = false
+
+		infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+		app.InfoLog = infoLog
+
+		errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+		app.ErrorLog = errorLog
 	
 		// set up the session
 		session = scs.New()
@@ -67,8 +78,9 @@ import (
 	
 		repo := handlers.NewRepo(&app)
 		handlers.NewHandlers(repo)
-	
 		render.NewTemplates(&app)
+		helpers.NewHelpers(&app)
+
 
 		return nil
    }
