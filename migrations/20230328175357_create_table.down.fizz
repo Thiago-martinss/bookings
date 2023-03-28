@@ -1,0 +1,4 @@
+drop_foreign_key("reservations", "reservations_rooms_id_fk", {"if_exists": true})
+sql("drop table users, rooms, reservations, restrictions, room_restrictions")
+
+
