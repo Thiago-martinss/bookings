@@ -40,7 +40,28 @@ create_table("room_restrictions") {
 }
 
 
-add_foreign_key("reservations", "room_id", {"rooms": ["id"]}, {
+add_foreign_key("room_restrictions", "room_id", {"rooms": ["id"]}, {
     "on_delete": "cascade",
     "on_update": "cascade",
 })
+
+add_foreign_key("room_restrictions", "restriction_id", {"restrictions": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+add_foreign_key("room_restrictions", "reservation_id", {"reservations": ["id"]}, {
+    "on_delete": "cascade",
+    "on_update": "cascade",
+})
+
+
+
+add_index("users", "email", {"unique": true})
+add_index("room_restrictions", ["start_date", "end_date"], {})
+add_index("room_restrictions", "room_id", {})
+add_index("reservations", "email", {})
+add_index("reservations", "last_name", {})
+
+
+
