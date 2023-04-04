@@ -53,7 +53,6 @@ import (
 		// what am I going to put in the session
 		gob.Register(models.Reservation{})
 		gob.Register(models.User{})
-		gob.Register(models.Reservation{})
 		gob.Register(models.Room{})
 		gob.Register(models.Restriction{})
 
