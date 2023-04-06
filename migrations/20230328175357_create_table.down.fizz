@@ -17,3 +17,5 @@ sql("drop table users, rooms, reservations, restrictions, room_restrictions")
 
 
 room_restrictions_reservation_id_idx
+
+
