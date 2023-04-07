@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"testing"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
@@ -24,41 +25,44 @@ var session *scs.SessionManager
 var pathToTemplates = "./../../templates"
 var functions = template.FuncMap{}
 
+func TestMain(m *testing.M) {
+// what am I going to put in the session
+gob.Register(models.Reservation{})
+
+infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+app.InfoLog = infoLog
+
+errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+app.ErrorLog = errorLog
+
+// change this to true when in production
+app.InProduction = false
+
+// set up the session
+session = scs.New()
+session.Lifetime = 24 * time.Hour
+session.Cookie.Persist = true
+session.Cookie.SameSite = http.SameSiteLaxMode
+session.Cookie.Secure = app.InProduction
+
+app.Session = session
+
+tc, err := CreateTestTemplateCache()
+if err != nil {
+	log.Fatal("cannot create template cache")
+}
+
+app.TemplateCache = tc
+app.UseCache = true
+
+repo := NewTestRepo(&app)
+NewHandlers(repo)
+
+render.NewRenderer(&app)
+os.Exit(m.Run())
+}
+
 func getRoutes() http.Handler {
-	// what am I going to put in the session
-	gob.Register(models.Reservation{})
-
-	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
-	app.InfoLog = infoLog
-
-	errorLog := log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
-	app.ErrorLog = errorLog
-
-	// change this to true when in production
-	app.InProduction = false
-
-	// set up the session
-	session = scs.New()
-	session.Lifetime = 24 * time.Hour
-	session.Cookie.Persist = true
-	session.Cookie.SameSite = http.SameSiteLaxMode
-	session.Cookie.Secure = app.InProduction
-
-	app.Session = session
-
-	tc, err := CreateTestTemplateCache()
-	if err != nil {
-		log.Fatal("cannot create template cache")
-	}
-
-	app.TemplateCache = tc
-	app.UseCache = true
-
-	repo := NewTestRepo(&app)
-	NewHandlers(repo)
-
-	render.NewRenderer(&app)
-
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)
