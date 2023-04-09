@@ -171,6 +171,7 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		From:    "thiago@gmail.com",
 		Subject: "Reservation Confirmation",
 		Content: htmlMessage,
+		Template: "basic.html",
 	}
 	m.App.MailChan <- msg
 
