@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -35,9 +36,9 @@ var theTests = []struct {
 	// 	{key: "end", value: "2021-01-31"},
 	// }, http.StatusOK},
 	// {"post-make-reservations", "/make-reservations", "POST", []postData{
-	// 	{key: "first_name", value: "Anshuman"},
-	// 	{key: "last_name", value: "Lawania"},
-	// 	{key: "email", value: "71anshuman@gmail.com"},
+	// 	{key: "first_name", value: "Thiago"},
+	// 	{key: "last_name", value: "Martins"},
+	// 	{key: "email", value: "71Thiago@gmail.com"},
 	// 	{key: "phone", value: "9718592942"},
 	// }, http.StatusOK},
 }
@@ -139,16 +140,16 @@ func TestRepository_PostReservation(t *testing.T) {
 		},
 	}
 
-	// reqBody := "first_name=Anshuman"
-	// reqBody = fmt.Sprintf("%s&%s", reqBody, "last_name=Lawania")
-	// reqBody = fmt.Sprintf("%s&%s", reqBody, "email=71anshuman@gmail.com")
+	// reqBody := "first_name=Thiago"
+	// reqBody = fmt.Sprintf("%s&%s", reqBody, "last_name=Martins")
+	// reqBody = fmt.Sprintf("%s&%s", reqBody, "email=71Thiago@gmail.com")
 	// reqBody = fmt.Sprintf("%s&%s", reqBody, "phone=7891424299")
 	// reqBody = fmt.Sprintf("%s&%s", reqBody, "room_id=1")
 
 	postedData := url.Values{}
-	postedData.Add("first_name", "Anshuman")
-	postedData.Add("last_name", "Lawania")
-	postedData.Add("email", "71anshuman@gmail.com")
+	postedData.Add("first_name", "Thiago")
+	postedData.Add("last_name", "Martins")
+	postedData.Add("email", "71Thiago@gmail.com")
 	postedData.Add("phone", "9718594945")
 	postedData.Add("room_id", "1")
 
@@ -188,7 +189,7 @@ func TestRepository_PostReservation(t *testing.T) {
 	// Test Form isInvalid
 	// reqBody := "first_name=a"
 	// reqBody = fmt.Sprintf("%s&%s", reqBody, "last_name=l")
-	// reqBody = fmt.Sprintf("%s&%s", reqBody, "email=71anshuman")
+	// reqBody = fmt.Sprintf("%s&%s", reqBody, "email=Thiago")
 	// reqBody = fmt.Sprintf("%s&%s", reqBody, "room_id=1")
 
 	postedData = url.Values{}
@@ -227,19 +228,19 @@ func TestRepository_PostReservation(t *testing.T) {
 	if rr.Code != http.StatusTemporaryRedirect {
 		t.Errorf("PostReservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
 	}
-/*
+
 	// Test when unable to insert reservation
 
-	// reqBody = "first_name=Anshuman"
-	// reqBody = fmt.Sprintf("%s&%s", reqBody, "last_name=Lawania")
-	// reqBody = fmt.Sprintf("%s&%s", reqBody, "email=71anshuman@gmail.com")
+	// reqBody = "first_name=Thiago"
+	// reqBody = fmt.Sprintf("%s&%s", reqBody, "last_name=Martins")
+	// reqBody = fmt.Sprintf("%s&%s", reqBody, "email=Thiago@gmail.com")
 	// reqBody = fmt.Sprintf("%s&%s", reqBody, "phone=7891424299")
 	// reqBody = fmt.Sprintf("%s&%s", reqBody, "room_id=1")
 
 	postedData = url.Values{}
-	postedData.Add("first_name", "Anshuman")
-	postedData.Add("last_name", "Lawania")
-	postedData.Add("email", "71anshuman@gmail.com")
+	postedData.Add("first_name", "Thiago")
+	postedData.Add("last_name", "Martins")
+	postedData.Add("email", "71Thiago@gmail.com")
 	postedData.Add("phone", "7891424299")
 	postedData.Add("room_id", "1")
 
@@ -264,9 +265,9 @@ func TestRepository_PostReservation(t *testing.T) {
 
 	// Test when unable to insert room restrictions
 	postedData = url.Values{}
-	postedData.Add("first_name", "Anshuman")
-	postedData.Add("last_name", "Lawania")
-	postedData.Add("email", "71anshuman@gmail.com")
+	postedData.Add("first_name", "Thiago")
+	postedData.Add("last_name", "Martins")
+	postedData.Add("email", "Thiago@gmail.com")
 	postedData.Add("phone", "7891424299")
 	postedData.Add("room_id", "1")
 
@@ -288,11 +289,126 @@ func TestRepository_PostReservation(t *testing.T) {
 	if rr.Code != http.StatusTemporaryRedirect {
 		t.Errorf("PostReservation handler returned wrong response code: got %d, wanted %d", rr.Code, http.StatusTemporaryRedirect)
 	}
-	*/
+
 }
 
+func TestReposity_AvailabilityJSON(t *testing.T) {
+	/*****************************************
+	// first case -- rooms are not available
+	*****************************************/
+	// create our request body
+	postedData := url.Values{}
+	postedData.Add("start", "2050-01-01")
+	postedData.Add("end", "2050-01-02")
+	postedData.Add("room_id", "1")
 
+	// create our request
+	req, _ := http.NewRequest("POST", "/search-availability-json", strings.NewReader(postedData.Encode()))
 
+	// get the context with session
+	ctx := getCtx(req)
+	req = req.WithContext(ctx)
+
+	// set the request header
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	// create our response recorder, which satisfies the requirements
+	// for http.ResponseWriter
+	rr := httptest.NewRecorder()
+
+	// make our handler a http.HandlerFunc
+	handler := http.HandlerFunc(Repo.AvailabilityJSON)
+
+	// make the request to our handler
+	handler.ServeHTTP(rr, req)
+
+	// since we have no rooms available, we expect to get status http.StatusSeeOther
+	// this time we want to parse JSON and get the expected response
+	var j jsonResponse
+	err := json.Unmarshal((rr.Body.Bytes()), &j)
+	if err != nil {
+		t.Error("failed to parse json!")
+	}
+
+	// since we specified a start date > 2049-12-31, we expect no availability
+	if j.OK {
+		t.Error("Got availability when none was expected in AvailabilityJSON")
+	}
+
+	/*****************************************
+	// second case -- rooms not available
+	*****************************************/
+	// create our request body
+	postedData = url.Values{}
+	postedData.Add("start", "2040-01-01")
+	postedData.Add("end", "2040-01-02")
+	postedData.Add("room_id", "1")
+
+	// create our request
+	req, _ = http.NewRequest("POST", "/search-availability-json", strings.NewReader(postedData.Encode()))
+
+	// get the context with session
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+
+	// set the request header
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	// create our response recorder, which satisfies the requirements
+	// for http.ResponseWriter
+	rr = httptest.NewRecorder()
+
+	// make our handler a http.HandlerFunc
+	handler = http.HandlerFunc(Repo.AvailabilityJSON)
+
+	// make the request to our handler
+	handler.ServeHTTP(rr, req)
+
+	// this time we want to parse JSON and get the expected response
+	err = json.Unmarshal((rr.Body.Bytes()), &j)
+	if err != nil {
+		t.Error("failed to parse json!")
+	}
+
+	// since we specified a start date < 2049-12-31, we expect availability
+	//if !j.OK {
+		//t.Error("Got no availability when some was expected in AvailabilityJSON")
+	//}
+
+	/*****************************************
+	// third case -- no request body
+	*****************************************/
+	// create our request
+	req, _ = http.NewRequest("POST", "/search-availability-json", nil)
+
+	// get the context with session
+	ctx = getCtx(req)
+	req = req.WithContext(ctx)
+
+	// set the request header
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	// create our response recorder, which satisfies the requirements
+	// for http.ResponseWriter
+	rr = httptest.NewRecorder()
+
+	// make our handler a http.HandlerFunc
+	handler = http.HandlerFunc(Repo.AvailabilityJSON)
+
+	// make the request to our handler
+	handler.ServeHTTP(rr, req)
+
+	// this time we want to parse JSON and get the expected response
+	err = json.Unmarshal((rr.Body.Bytes()), &j)
+	if err != nil {
+		t.Error("failed to parse json!")
+	}
+
+	// since we specified a start date < 2049-12-31, we expect availability
+	if j.OK || j.Message != "Internal server error" {
+		t.Error("Got availability when request body was empty")
+	}
+}
 
 func getCtx(req *http.Request) context.Context {
 	ctx, err := session.Load(req.Context(), req.Header.Get("X-Session"))

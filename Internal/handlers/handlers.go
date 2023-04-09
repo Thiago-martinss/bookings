@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
-	"github.com/go-chi/chi"
 	"github.com/thiago-martinss/bookings/internal/config"
 	"github.com/thiago-martinss/bookings/internal/driver"
 	"github.com/thiago-martinss/bookings/internal/forms"
@@ -232,7 +232,19 @@ type jsonResponse struct {
 }
 
 func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		// can't parse form, so return appropriate json
+		resp := jsonResponse{
+			OK:      false,
+			Message: "Internal server error",
+		}
 
+		out, _ := json.MarshalIndent(resp, "", "      ")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(out)
+		return
+	}
 	sd := r.Form.Get("start")
 	ed := r.Form.Get("end")
 
@@ -256,7 +268,15 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 
 	available, err := m.DB.SearchAvailabilityByDatesByRoomID(startDate, endDate, roomID)
 	if err != nil {
-		helpers.ServerError(w, err)
+		// can't parse form, so return appropriate json
+		resp := jsonResponse{
+			OK:      false,
+			Message: "Error connecting to database",
+		}
+
+		out, _ := json.MarshalIndent(resp, "", "      ")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(out)
 		return
 	}
 	resp := jsonResponse{
@@ -267,11 +287,7 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 		RoomID:    strconv.Itoa(roomID),
 	}
 
-	out, err := json.MarshalIndent(resp, "", "     ")
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
+	out, _ := json.MarshalIndent(resp, "", "     ")
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(out)
@@ -312,11 +328,8 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 
 // ChooseRoom display a list of available rooms
 func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
-	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
+	exploded := strings.Split(r.RequestURI, "/")
+	roomID, err := strconv.Atoi(exploded[2])
 
 	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
