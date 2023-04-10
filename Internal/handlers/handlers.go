@@ -160,27 +160,27 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// send notifications
-	htmlMessage := fmt.Sprintf( `
+	htmlMessage := fmt.Sprintf(`
 		<strong> Reservation Confirmation </strong><br>
 		Dear %s: <br>
 		This is to confirm you reservation from %s to %s
 	
 	`, reservation.FirstName, reservation.StartDate.Format("2006-01-02"), reservation.EndDate.Format("2006-01-02"))
 	msg := models.MailData{
-		To:      reservation.Email,
-		From:    "thiago@gmail.com",
-		Subject: "Reservation Confirmation",
-		Content: htmlMessage,
+		To:       reservation.Email,
+		From:     "thiago@gmail.com",
+		Subject:  "Reservation Confirmation",
+		Content:  htmlMessage,
 		Template: "basic.html",
 	}
 	m.App.MailChan <- msg
 
-	htmlMessage = fmt.Sprintf( `
+	htmlMessage = fmt.Sprintf(`
 		<strong> Reservation Confirmation </strong><br>
 		Dear "Owner": <br>
 		This is to confirm a new reservation was made %s to %s on %s room
 	
-	`,reservation.StartDate.Format("2006-01-02"), reservation.EndDate.Format("2006-01-02"), reservation.Room.RoomName)
+	`, reservation.StartDate.Format("2006-01-02"), reservation.EndDate.Format("2006-01-02"), reservation.Room.RoomName)
 	msg = models.MailData{
 		To:      "Owner@gmail.com",
 		From:    "bookings@gmail.com",
@@ -189,7 +189,6 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	m.App.MailChan <- msg
-	
 
 	m.App.Session.Put(r.Context(), "reservation", reservation)
 
@@ -404,11 +403,9 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
 
-	
-
 }
 
-func (m *Repository) ShowLogin( w http.ResponseWriter, r *http.Request) {
+func (m *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "login.page.html", &models.TemplateData{
 		Form: forms.New(nil),
 	})

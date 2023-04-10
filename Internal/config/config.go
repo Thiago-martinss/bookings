@@ -13,8 +13,8 @@ type AppConfig struct {
 	UseCache      bool
 	TemplateCache map[string]*template.Template
 	InfoLog       *log.Logger
-	ErrorLog	  *log.Logger
+	ErrorLog      *log.Logger
 	InProduction  bool
 	Session       *scs.SessionManager
-	MailChan	  chan models.MailData
+	MailChan      chan models.MailData
 }
