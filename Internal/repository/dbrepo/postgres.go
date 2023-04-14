@@ -391,14 +391,15 @@ func (m *postgresDBRepo) GetReservationByID(id int) (models.Reservation, error) 
 }
 
 
-// UpdatedUser updates a reservation in the database
+// UpdateReservation updates a reservation in the database
 func (m *postgresDBRepo) UpdateReservation(u models.Reservation) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `update reservations set first_name = $1, last_name = $2, email = $3,
-	phone = 4$, updated_at = $5
-	from users where id = $6`
+	query := `
+		update reservations set first_name = $1, last_name = $2, email = $3, phone = $4, updated_at = $5
+		where id = $6
+`
 
 	_, err := m.DB.ExecContext(ctx, query,
 		u.FirstName,
@@ -407,11 +408,12 @@ func (m *postgresDBRepo) UpdateReservation(u models.Reservation) error {
 		u.Phone,
 		time.Now(),
 	)
+
 	if err != nil {
 		return err
 	}
-	return nil
 
+	return nil
 }
 
 // DeleteReservation deletes of reservation by id
@@ -419,7 +421,7 @@ func (m *postgresDBRepo) DeleteReservation(id int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := "delete from reservations where id = 1$"
+	query := "delete from reservations where id = $1"
 
 	_, err := m.DB.ExecContext(ctx, query, id)
 	if err != nil {
