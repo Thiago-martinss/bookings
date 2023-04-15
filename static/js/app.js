@@ -1,10 +1,9 @@
 function Prompt() {
     let toast = function (c) {
-        const{
-            msg = '',
-            icon = 'success',
-            position = 'top-end',
-
+        const {
+            msg = "",
+            icon = "success",
+            position = "top-end",
         } = c;
 
         const Toast = Swal.mixin({
@@ -29,7 +28,7 @@ function Prompt() {
             msg = "",
             title = "",
             footer = "",
-        } = c
+        } = c;
 
         Swal.fire({
             icon: 'success',
@@ -37,7 +36,6 @@ function Prompt() {
             text: msg,
             footer: footer,
         })
-
     }
 
     let error = function (c) {
@@ -45,7 +43,7 @@ function Prompt() {
             msg = "",
             title = "",
             footer = "",
-        } = c
+        } = c;
 
         Swal.fire({
             icon: 'error',
@@ -53,18 +51,17 @@ function Prompt() {
             text: msg,
             footer: footer,
         })
-
     }
 
     async function custom(c) {
         const {
-            icon= "",
+            icon = "",
             msg = "",
             title = "",
-            showConfirmButton = true
+            showConfirmButton = true,
         } = c;
 
-        const { value: result } = await Swal.fire({
+        const {value: result} = await Swal.fire({
             icon: icon,
             title: title,
             html: msg,
@@ -78,15 +75,9 @@ function Prompt() {
                 }
             },
             didOpen: () => {
-                if (c.didOpen !== undefined){
+                if (c.didOpen !== undefined) {
                     c.didOpen();
                 }
-            },
-            preConfirm: () => {
-                return [
-                    document.getElementById('start').value,
-                    document.getElementById('end').value
-                ]
             }
         })
 
@@ -105,6 +96,7 @@ function Prompt() {
         }
     }
 
+
     return {
         toast: toast,
         success: success,
@@ -112,5 +104,3 @@ function Prompt() {
         custom: custom,
     }
 }
-
-
